@@ -51,6 +51,29 @@ def act(self, game_state: dict) -> str:
     self.logger.debug("Querying model for action.")
     return np.random.choice(ACTIONS, p=self.model)
 
+#   # Aktuelle Position des Agenten
+#    x, y = game_state['self'][-1]
+#   
+#    # Liste der Coins aus dem aktuellen Spielstatus
+#    coins = game_state['coins']
+#    # Warten, wenn keine Coins vorhanden sind
+#    if not coins:
+#       return 'WAIT'
+#    # Den nächsten Coin basierend auf der Manhattan-Distanz finden
+#    target_coin = min(coins, key=lambda c: abs(c[0] - x) + abs(c[1] - y))
+#    target_x, target_y = target_coin
+#    # Entscheidung für die Bewegung in Richtung des Ziel-Coins
+#    if target_x < x:
+#        return 'LEFT'
+#    elif target_x > x:
+#        return 'RIGHT'
+#    elif target_y < y:
+#        return 'UP'
+#    elif target_y > y:
+#        return 'DOWN'
+#    else:
+#        return 'WAIT'
+
 
 def state_to_features(game_state: dict) -> np.array:
     """
