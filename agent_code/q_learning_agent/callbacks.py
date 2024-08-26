@@ -2,6 +2,8 @@ import numpy as np
 import os
 import pickle
 
+from AHA.agent_code.q_learning_agent.a_star import find_nearest_coin_with_a_star
+
 #ACTIONS = ['UP', 'RIGHT', 'DOWN', 'LEFT', 'WAIT', 'BOMB']
 ACTIONS = ['UP', 'RIGHT', 'DOWN', 'LEFT', 'WAIT']
 
@@ -38,12 +40,8 @@ def state_to_tuple(game_state: dict) -> tuple:
     bombs = game_state['bombs']
     
     # Berechne relative Position zur nächsten Münze
-    if coins:
-        nearest_coin = min(coins, key=lambda c: np.linalg.norm(np.array(c) - np.array(own_position)))
-        coin_rel_pos = (nearest_coin[0] - own_position[0], nearest_coin[1] - own_position[1])
-    else:
-        coin_rel_pos = (0, 0)  # Keine Münzen vorhanden
-    
+    coin_rel_pos = find_nearest_coin_with_a_star(own_position, coins, field)
+
     # Umgebungsinformationen sammeln
     surroundings = []
     directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]  # LEFT, RIGHT, UP, DOWN
@@ -73,23 +71,22 @@ def state_to_tuple(game_state: dict) -> tuple:
     )
 
 def act(self, game_state: dict) -> str:
-    """
-    Decide which action to take in the current game state.
-    """
     state = state_to_tuple(game_state)
     
-    # Initialisiere den Zustand, wenn er nicht in der Q-Tabelle vorhanden ist
     if state not in self.q_table:
         self.q_table[state] = np.zeros(len(ACTIONS))
-    
-    # Epsilon-Greedy-Strategie für Exploration und Exploitation
+
     if np.random.rand() < self.epsilon:
-        # Wähle zufällige Aktion (Exploration)
         action = np.random.choice(ACTIONS)
     else:
-        # Wähle beste Aktion basierend auf Q-Werten (Exploitation)
-        action_index = np.argmax(self.q_table[state])
+        # Rauschen hinzufügen mit der gleichen Form wie die Q-Werte
+        noise = np.random.randn(len(self.q_table[state])) * 0.1
+        action_index = np.argmax(self.q_table[state] + noise)
+        
+        # Überprüfe, ob der action_index im Bereich der ACTIONS-Liste liegt
+        if action_index >= len(ACTIONS) or action_index < 0:
+            action_index = np.argmax(self.q_table[state])  # Fallback auf die beste bekannte Aktion
+        
         action = ACTIONS[action_index]
-    
-    return action
 
+    return action
