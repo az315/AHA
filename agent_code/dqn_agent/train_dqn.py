@@ -27,28 +27,24 @@ def train_dqn(agent, env, episodes):
             state = next_state
             total_reward += reward
 
-            # Replay nicht nach jedem Schritt, sondern wenn genügend Samples vorhanden sind
             if len(agent.memory.buffer) > agent.batch_size:
                 agent.replay()
 
         rewards.append(total_reward)
         logger.info(f"Episode: {e}, Total Reward: {total_reward}, Epsilon: {agent.epsilon}")
 
-        # Alle 100 Episoden plotten
         if (e + 1) % 100 == 0:
             plot_rewards(rewards, filename=f'rewards_plot_{e+1}.png')
 
-        # Speichere das Modell alle 100 Episoden
         if (e + 1) % 100 == 0:
             agent.save('dqn_model.pth')
 
-        # Beispiel: Führe alle 500 Episoden eine Evaluierung durch
         if (e + 1) % 500 == 0:
             evaluate_dqn(agent, env, episodes=10)
 
 def evaluate_dqn(agent, env, episodes=10):
     original_epsilon = agent.epsilon
-    agent.epsilon = 0.0  # Setze Epsilon auf 0 für die Evaluierung
+    agent.epsilon = 0.0
 
     for e in range(episodes):
         state = env.reset()
@@ -62,6 +58,5 @@ def evaluate_dqn(agent, env, episodes=10):
             total_reward += reward
 
         logger.info(f"Evaluation Episode: {e+1}/{episodes}, Total Reward: {total_reward}")
-        print(f"Evaluation Episode {e+1}/{episodes}, Total Reward: {total_reward}")
 
     agent.epsilon = original_epsilon

@@ -16,7 +16,6 @@ def setup(self):
     try:
         if os.path.isfile("dqn_model.pth"):
             self.agent.load("dqn_model.pth")
-            logger.info("DQN-Modell erfolgreich geladen.")
         else:
             logger.info("Kein vorhandenes Modell gefunden, starte mit einem neuen.")
     except Exception as e:
@@ -27,10 +26,8 @@ def act(self, game_state: dict) -> str:
     state = state_to_tuple(game_state)
     action_index = self.agent.act(state)
     if 0 <= action_index < len(ACTIONS):
-        logger.info(f"Action taken: {ACTIONS[action_index]} for state: {state}")
         return ACTIONS[action_index]
     else:
-        logger.error(f"Ungültiger Aktionsindex: {action_index}")
         return 'WAIT'  # Fallback-Aktion
 
 def state_to_tuple(game_state: dict) -> np.array:
@@ -79,7 +76,5 @@ def state_to_tuple(game_state: dict) -> np.array:
 
     # Feature-Vektor erstellen
     features = np.concatenate((coin_rel_pos, bomb_rel_pos, surroundings))
-
-    # Zusätzliche Features können hier hinzugefügt werden
 
     return features
